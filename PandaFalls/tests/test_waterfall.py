@@ -8,21 +8,20 @@ class TestWaterfall(unittest.TestCase):
     def test_waterfall_can_add_column(self):
         df = pd.DataFrame({'Revenue': [500], 'Cost': [200]})
         profit = waterfall('Profit', df).plus('Revenue')
-        expect(profit.equation).to(equal([('=', 'Profit'), ('+', 'Revenue')]))
+        expect(profit.equation).to(equal([('Revenue', 500)]))
 
     def test_waterfall_can_subtract_column(self):
         df = pd.DataFrame({'Revenue': [500], 'Cost': [200]})
         profit = waterfall('Profit', df).plus('Revenue').minus('Cost')
-        expect(profit.equation).to(equal([('=', 'Profit'), ('+', 'Revenue'), ('-', 'Cost')]))
+        expect(profit.equation).to(equal([('Revenue', 500),('Cost',-200)]))
 
     def test_waterfall_can_output_c3_json(self):
         df = pd.DataFrame({'Revenue': [500], 'Cost': [200]})
         profit = waterfall('Profit', df).plus('Revenue').minus('Cost')
 
         c3_json = profit.to_c3()
-
-        expect(c3_json['data']['type']).to(equal('bar'))
-        expect(c3_json['data']['columns']).to(equal([
+        print c3_json['columns']
+        expect(self.checkEqual(c3_json['columns'], [
             ['Profit', 0, 0, 300],
             ['Revenue', 500, 0, 0],
             ['Cost', 0, 200, 0],
@@ -30,7 +29,7 @@ class TestWaterfall(unittest.TestCase):
         ]))
 
         expect(self.checkEqual(
-            c3_json['data']['groups'],
+            c3_json['groups'],
             ['Revenue', 'Cost', 'Profit']
         )).to(be_true)
 

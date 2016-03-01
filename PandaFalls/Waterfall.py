@@ -3,7 +3,7 @@ import numpy as np
 class waterfall:
     def __init__(self, name, dataframe):
         self.name = name
-        self.dataframe = dataframe
+        self.dataframe = transpose(dataframe)
         self.equation = []
 
     def plus(self, column):
@@ -58,3 +58,7 @@ class waterfall:
             calculated_column[i] = value_prev + num_operation * value
 
         return calculated_column
+
+def transpose(dataframe):
+    return dataframe.sum().to_frame().transpose()        
+

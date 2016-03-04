@@ -36,6 +36,6 @@ class TestWaterfall(unittest.TestCase):
                 Labels=['Revenue','Cost','Interest','Profit']
             )))
 
-    def test_waterfall_makes_matplotlib_figure(self):
-        # Running into virtualenv problems with matplotlib
-        pass
+    # def test_waterfall_makes_matplotlib_figure(self):
+          # Running into virtualenv problems with matplotlib
+    #     pass

@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 
 
 class waterfall:
@@ -43,6 +42,7 @@ class waterfall:
         return waterfall_dict
 
     def to_matplotlib(self):
+        import matplotlib.pyplot as plt
         fig, ax = plt.subplots()
         index = np.arange(4)
         bar_width = 0.35

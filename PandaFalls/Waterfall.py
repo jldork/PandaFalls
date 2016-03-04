@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class waterfall:
@@ -36,24 +37,33 @@ class waterfall:
             running_total += value
             waterfall_dict['Calculated'][i] = running_total if i > 0 else 0
             waterfall_dict['Labels'][i] = self.equation[i][0]
-        
+
         waterfall_dict['Labels'][equation_length] = self.name
-        waterfall_dict['Net'][equation_length] = waterfall_dict['Calculated'][equation_length-1]
+        waterfall_dict['Net'][equation_length] = waterfall_dict['Calculated'][equation_length - 1]
         return waterfall_dict
 
-    def calculated_column(self):
-        calculated_column = [0] * (len(self.equation) + 1)
-        calculated_column[0] = 'Calculated'
-        for i in range(2, len(self.equation)):
-            operation = self.equation[i][0]
-            num_operation = -1 if operation == '-' else 1
+    def to_matplotlib(self):
+        fig, ax = plt.subplots()
+        index = np.arange(4)
+        bar_width = 0.35
+        opacity = 0.4
 
-            name = self.equation[i][1]
-            value = self.dataframe[name][0]
+        Positive = plt.bar(index, waterfall['Positive'], bar_width,
+                           bottom=waterfall['Calculated'],
+                           alpha=opacity,
+                           color='g',
+                           label='Positive')
+        Negative = plt.bar(index, waterfall['Negative'], bar_width,
+                           bottom=waterfall['Calculated'],
+                           alpha=opacity,
+                           color='r',
+                           label='Negative')
 
-            name_prev = self.equation[i - 1][1]
-            value_prev = self.dataframe[name_prev][0]
+        Net = plt.bar(index, waterfall['Net'], bar_width,
+                      bottom=waterfall['Calculated'],
+                      alpha=opacity,
+                      color='b',
+                      label='Net')
 
-            calculated_column[i] = value_prev + num_operation * value
-
-        return calculated_column
+        plt.xticks(index + bar_width / 2., waterfall['Labels'])
+        ax.set_frame_on(False)

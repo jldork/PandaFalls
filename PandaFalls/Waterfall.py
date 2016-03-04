@@ -1,9 +1,10 @@
 import numpy as np
 
+
 class waterfall:
     def __init__(self, name, dataframe):
         self.name = name
-        self.dataframe = transpose(dataframe)
+        self.dataframe = dataframe.sum().to_frame().transpose()
         self.equation = []
 
     def plus(self, column):
@@ -11,36 +12,34 @@ class waterfall:
         return self
 
     def minus(self, column):
-        self.equation.append((column, self.dataframe[column][0]*-1))
+        self.equation.append((column, self.dataframe[column][0] * -1))
         return self
 
-    def to_c3(self):
-        data = dict(columns=[], groups=[])
+    def to_dict(self):
+        equation_length = len(self.equation)
+        waterfall_dict = dict(
+            Net=[0] * (equation_length + 1),
+            Positive=[0] * (equation_length + 1),
+            Negative=[0] * (equation_length + 1),
+            Calculated=[0] * (equation_length + 1),
+            Labels=[0] * (equation_length + 1)
+        )
 
-        for i in range(len(self.equation)):
-            chart_row = [0] * (len(self.equation) + 2)
-
-            column_name = self.equation[i][0]
+        running_total = 0
+        for i in range(equation_length):
+            # populate positive and negative
             value = self.equation[i][1]
+            pos_or_neg = 'Positive' if value >= 0 else 'Negative'
+            waterfall_dict[pos_or_neg][i] = abs(value)
 
-            chart_row[0] = column_name
-            chart_row[i+1] = value
-
-            data['columns'].append(chart_row)
-            data['groups'].append(column_name)
-
-        values = [variable[1] for variable in self.equation]
-        values_shifted = values[1:] + [0]
-        calculated_row = ['Calculated',0] + list(np.array(values) + np.array(values_shifted))[:-1] + [0]
-        data['columns'].append(calculated_row)
-
-        final_row = [0] * (len(self.equation) + 2)
-        final_row[0] = self.name
-        final_row[-1] = calculated_row[-2]
-        data['columns'].append(final_row)
-        data['groups'].append(self.name)
-
-        return data
+            # populate Calculated
+            running_total += value
+            waterfall_dict['Calculated'][i] = running_total if i > 0 else 0
+            waterfall_dict['Labels'][i] = self.equation[i][0]
+        
+        waterfall_dict['Labels'][equation_length] = self.name
+        waterfall_dict['Net'][equation_length] = waterfall_dict['Calculated'][equation_length-1]
+        return waterfall_dict
 
     def calculated_column(self):
         calculated_column = [0] * (len(self.equation) + 1)
@@ -58,7 +57,3 @@ class waterfall:
             calculated_column[i] = value_prev + num_operation * value
 
         return calculated_column
-
-def transpose(dataframe):
-    return dataframe.sum().to_frame().transpose()        
-

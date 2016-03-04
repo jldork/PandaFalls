@@ -17,28 +17,21 @@ class TestWaterfall(unittest.TestCase):
 
         expect(profit.equation).to(equal([('Revenue', 500), ('Cost', -200)]))
 
-    def test_waterfall_makes_c3_output(self):
-        df = pd.DataFrame({'Revenue': [200, 300], 'Cost': [100, 100], 'Interest': [10,40]})
+    def test_waterfall_makes_dictionary_output(self):
+        df = pd.DataFrame({'Revenue': [200, 300], 'Cost': [100, 100], 'Interest': [10, 40]})
         profit = waterfall('Profit', df).plus('Revenue').minus('Cost').minus('Interest')
 
         expect(profit.equation).to(equal(
             [('Revenue', 500), ('Cost', -200), ('Interest', -50)]
         ))
 
-        c3_json = profit.to_c3()
+        waterfall_dict = profit.to_dict()
 
-        expect(self.checkEqual(c3_json['columns'], [
-            ['Profit', 0, 0, 0, 250],
-            ['Revenue', 500, 0, 0, 0],
-            ['Cost', 0, 200, 0, 0],
-            ['Interest', 0, 0, 50, 0],
-            ['Calculated', 0, 300, 250, 0]
-        ]))
-
-        expect(self.checkEqual(
-            c3_json['groups'],
-            ['Revenue', 'Cost', 'Profit', 'Interest']
-        )).to(be_true)
-
-    def checkEqual(self, list1, list2):
-        return len(list1) == len(list2) and sorted(list1) == sorted(list2)
+        expect(waterfall_dict).to(equal(
+            dict(
+                Net=[0, 0, 0, 250],
+                Positive=[500, 0, 0, 0],
+                Negative=[0, 200, 50, 0],
+                Calculated=[0, 300, 250, 0],
+                Labels=['Revenue','Cost','Interest','Profit']
+            )))
